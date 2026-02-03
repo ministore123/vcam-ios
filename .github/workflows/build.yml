@@ -22,13 +22,12 @@ jobs:
           libssl-dev libplist-dev
 
     - name: Install ldid (required for iOS tweak)
-      run: |
-        git clone https://github.com/ProcursusTeam/ldid.git
-        cd ldid
-        make
-        sudo make install
-        which ldid
-        ldid -v
+  run: |
+    git clone https://github.com/ProcursusTeam/ldid.git
+    cd ldid
+    make
+    sudo make install
+    ldid -v
 
     - name: Install Theos
       run: |
