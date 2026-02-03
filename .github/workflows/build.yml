@@ -24,7 +24,7 @@ jobs:
           perl \
           curl
 
-    - name: Install ldid
+- name: Install ldid (required for iOS tweak)
   run: |
     git clone https://github.com/ProcursusTeam/ldid.git
     cd ldid
