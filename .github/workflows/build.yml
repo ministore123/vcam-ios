@@ -25,13 +25,12 @@ jobs:
           curl
 
     - name: Install ldid
-      run: |
-        git clone https://github.com/ProcursusTeam/ldid.git
-        cd ldid
-        make
-        sudo make install
-        which ldid
-        ldid --help
+  run: |
+    git clone https://github.com/ProcursusTeam/ldid.git
+    cd ldid
+    make
+    sudo make install
+    which ldid
 
     - name: Setup Theos
       run: |
