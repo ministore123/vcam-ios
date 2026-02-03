@@ -9,29 +9,29 @@ jobs:
 
     steps:
     # ===============================
-    # 1. CHECKOUT SOURCE
+    # 1. CHECKOUT
     # ===============================
     - name: Checkout source
       uses: actions/checkout@v4
 
     # ===============================
-    # 2. INSTALL BUILD DEPENDENCIES
+    # 2. DEPENDENCIES
     # ===============================
-    - name: Install build dependencies
+    - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install -y \
           build-essential \
-          clang \
           git \
           make \
-          perl \
           curl \
+          clang \
           libssl-dev \
-          libplist-dev
+          libplist-dev \
+          xz-utils
 
     # ===============================
-    # 3. INSTALL LDID (KHÔNG GỌI LDID)
+    # 3. INSTALL LDID
     # ===============================
     - name: Install ldid
       run: |
@@ -39,7 +39,6 @@ jobs:
         cd ldid
         make
         sudo make install
-        which ldid
 
     # ===============================
     # 4. SETUP THEOS
@@ -51,7 +50,16 @@ jobs:
         echo "$HOME/theos/bin" >> $GITHUB_PATH
 
     # ===============================
-    # 5. INSTALL iOS SDK (CÁCH 1 – ỔN ĐỊNH NHẤT)
+    # 5. INSTALL THEOS TOOLCHAIN (QUAN TRỌNG)
+    # ===============================
+    - name: Install Theos toolchain
+      run: |
+        mkdir -p $HOME/theos/toolchain
+        curl -L https://github.com/theos/theos/releases/latest/download/toolchain-linux.tar.xz -o toolchain.tar.xz
+        tar -xf toolchain.tar.xz -C $HOME/theos/toolchain
+
+    # ===============================
+    # 6. INSTALL SDK (CÁCH ỔN ĐỊNH)
     # ===============================
     - name: Install iOS SDK 16.5
       run: |
@@ -60,17 +68,17 @@ jobs:
         cp -R /tmp/theos-sdks/iPhoneOS16.5.sdk $HOME/theos/sdks/
 
     # ===============================
-    # 6. BUILD TWEAK (ROOTLESS)
+    # 7. BUILD ROOTLESS TWEAK
     # ===============================
-    - name: Build tweak (.deb)
+    - name: Build tweak
       run: |
         make clean
         make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
 
     # ===============================
-    # 7. UPLOAD .DEB
+    # 8. UPLOAD DEB
     # ===============================
-    - name: Upload deb artifact
+    - name: Upload deb
       uses: actions/upload-artifact@v4
       with:
         name: vcam-deb
