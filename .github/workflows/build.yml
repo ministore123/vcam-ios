@@ -1,4 +1,4 @@
-name: Build iOS Tweak (Rootless Dopamine)
+name: Build iOS Tweak (Rootless)
 
 on:
   workflow_dispatch:
@@ -8,31 +8,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # ===============================
+    # =========================
     # 1. CHECKOUT
-    # ===============================
-    - name: Checkout source
+    # =========================
+    - name: Checkout
       uses: actions/checkout@v4
 
-    # ===============================
+    # =========================
     # 2. DEPENDENCIES
-    # ===============================
+    # =========================
     - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install -y \
           build-essential \
+          clang \
           git \
           make \
           curl \
-          clang \
           libssl-dev \
           libplist-dev \
           xz-utils
 
-    # ===============================
+    # =========================
     # 3. INSTALL LDID
-    # ===============================
+    # =========================
     - name: Install ldid
       run: |
         git clone https://github.com/ProcursusTeam/ldid.git
@@ -40,44 +40,36 @@ jobs:
         make
         sudo make install
 
-    # ===============================
+    # =========================
     # 4. SETUP THEOS
-    # ===============================
+    # =========================
     - name: Setup Theos
       run: |
         git clone --recursive https://github.com/theos/theos.git $HOME/theos
         echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+        echo "THEOS_USE_SYSTEM_CLANG=1" >> $GITHUB_ENV
         echo "$HOME/theos/bin" >> $GITHUB_PATH
 
-    # ===============================
-    # 5. INSTALL THEOS TOOLCHAIN (QUAN TRỌNG)
-    # ===============================
-    - name: Install Theos toolchain
-      run: |
-        mkdir -p $HOME/theos/toolchain
-        curl -L https://github.com/theos/theos/releases/latest/download/toolchain-linux.tar.xz -o toolchain.tar.xz
-        tar -xf toolchain.tar.xz -C $HOME/theos/toolchain
-
-    # ===============================
-    # 6. INSTALL SDK (CÁCH ỔN ĐỊNH)
-    # ===============================
+    # =========================
+    # 5. INSTALL SDK (CÁCH CHUẨN)
+    # =========================
     - name: Install iOS SDK 16.5
       run: |
         mkdir -p $HOME/theos/sdks
-        git clone https://github.com/theos/sdks.git /tmp/theos-sdks
-        cp -R /tmp/theos-sdks/iPhoneOS16.5.sdk $HOME/theos/sdks/
+        git clone https://github.com/theos/sdks.git /tmp/sdks
+        cp -R /tmp/sdks/iPhoneOS16.5.sdk $HOME/theos/sdks/
 
-    # ===============================
-    # 7. BUILD ROOTLESS TWEAK
-    # ===============================
+    # =========================
+    # 6. BUILD ROOTLESS
+    # =========================
     - name: Build tweak
       run: |
         make clean
         make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
 
-    # ===============================
-    # 8. UPLOAD DEB
-    # ===============================
+    # =========================
+    # 7. UPLOAD DEB
+    # =========================
     - name: Upload deb
       uses: actions/upload-artifact@v4
       with:
