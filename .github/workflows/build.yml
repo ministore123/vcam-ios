@@ -27,7 +27,8 @@ jobs:
     cd ldid
     make
     sudo make install
-    ldid -v
+    which ldid
+    ldid -v || true
 
     - name: Install Theos
       run: |
