@@ -23,6 +23,7 @@ jobs:
         sudo apt install -y \
           build-essential \
           clang \
+          lld \
           git \
           make \
           curl \
@@ -47,11 +48,11 @@ jobs:
       run: |
         git clone --recursive https://github.com/theos/theos.git $HOME/theos
         echo "THEOS=$HOME/theos" >> $GITHUB_ENV
-        echo "THEOS_USE_SYSTEM_CLANG=1" >> $GITHUB_ENV
+        echo "THEOS_TOOLCHAIN=clang" >> $GITHUB_ENV
         echo "$HOME/theos/bin" >> $GITHUB_PATH
 
     # =========================
-    # 5. INSTALL SDK (CÁCH CHUẨN)
+    # 5. INSTALL SDK
     # =========================
     - name: Install iOS SDK 16.5
       run: |
