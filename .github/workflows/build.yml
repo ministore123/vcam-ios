@@ -14,8 +14,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          git curl wget build-essential \
-          clang lld make \
+          git curl wget unzip \
+          build-essential clang make \
           dpkg-dev fakeroot \
           libssl-dev libplist-dev
 
@@ -31,6 +31,14 @@ jobs:
         git clone --recursive https://github.com/theos/theos.git $HOME/theos
         echo "THEOS=$HOME/theos" >> $GITHUB_ENV
         echo "$HOME/theos/bin" >> $GITHUB_PATH
+
+    - name: Install iOS SDK
+      run: |
+        mkdir -p $HOME/theos/sdks
+        cd $HOME/theos/sdks
+        wget https://github.com/theos/sdks/archive/refs/heads/master.zip
+        unzip master.zip
+        cp -r sdks-master/iPhoneOS14.5.sdk .
 
     - name: Build tweak
       run: |
