@@ -1,16 +1,18 @@
-name: Build iOS Tweak
+name: Build iOS Tweak (.deb)
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout source
+      uses: actions/checkout@v4
 
-    - name: Install dependencies
+    - name: Install system dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y \
@@ -19,27 +21,37 @@ jobs:
           dpkg-dev fakeroot \
           libssl-dev libplist-dev
 
-    - name: Install ldid
+    - name: Install ldid (required for iOS tweak)
       run: |
         git clone https://github.com/ProcursusTeam/ldid.git
         cd ldid
         make
         sudo make install
+        which ldid
+        ldid -v
 
-    - name: Setup Theos
+    - name: Install Theos
       run: |
         git clone --recursive https://github.com/theos/theos.git $HOME/theos
         echo "THEOS=$HOME/theos" >> $GITHUB_ENV
         echo "$HOME/theos/bin" >> $GITHUB_PATH
 
-    - name: Install iOS SDK
+    - name: Install iOS SDK (14.5)
       run: |
         mkdir -p $HOME/theos/sdks
         cd $HOME/theos/sdks
         wget https://github.com/theos/sdks/archive/refs/heads/master.zip
         unzip master.zip
         cp -r sdks-master/iPhoneOS14.5.sdk .
+        ls $HOME/theos/sdks
 
     - name: Build tweak
       run: |
+        export SDKVERSION=14.5
         make package
+
+    - name: Upload deb artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: tweak-deb
+        path: packages/*.deb
